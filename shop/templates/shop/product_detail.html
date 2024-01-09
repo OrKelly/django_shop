@@ -71,9 +71,9 @@
 
                             <div class="col-6 text-end">
 
-                                <button type="button" id="add-button" value="" class="btn btn-secondary btn-sm">
+                                <button type="button" id="add-button" value="{{product.id}}" class="btn btn-secondary btn-sm">
 
-                                Add to cart
+                                Добавить в корзину
 
                                 </button>
                             </div>
@@ -85,4 +85,31 @@
     </main>
     <br>
 </div>
+<script>
+    $(document).on('click', '#add-button', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "cart:add-to-cart" %}',
+            data: {
+                product_id: $('#add-button').val(),
+                product_qty: $('#select option:selected').text(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            success: function(response){
+                document.getElementById('lblCartCount').textContent = response.qty
+
+            },
+            error: function(error){
+                console.log(error)
+            }
+        })
+
+    })
+
+
+</script>
+
 {% endblock %}
