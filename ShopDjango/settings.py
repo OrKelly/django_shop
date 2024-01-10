@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     #apps
     'shop',
     'cart',
-    'account'
+    'account',
+    'payment'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = 'account:login'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
