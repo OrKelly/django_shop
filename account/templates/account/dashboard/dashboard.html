@@ -1,0 +1,36 @@
+{%  extends "layout.html" %}
+
+{% load static %}
+
+
+
+{% block content %}
+
+    <br>
+    <div class="container bg-white shadow-md p-3">
+        <h4>Добро пожаловать, {{ user.username }}!</h4>
+
+        <hr>
+
+        <h6>Персональная информация</h6>
+
+        <a href="{% url 'account:logout' %}">
+        <button class="btn btn-primary">
+            Выйти
+            </button>
+        </a>
+
+        <a href="{% url 'account:profile-management' %}">
+            <button class="btn btn-success">
+                Обновить аккаунт
+                </button>
+            </a>
+        
+            <a href="{% url 'account:delete-user' %}">
+                <button class="btn btn-warning">
+                    Удалить аккаунт
+                    </button>
+                </a>
+
+    </div>
+{% endblock %}
