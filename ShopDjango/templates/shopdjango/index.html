@@ -1,0 +1,23 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Добро пожаловать!</title>
+    <link rel="stylesheet" href="{% static 'djangoshop/css/style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'fonts/montserrat:wght@300,400,500.css' %}"/>
+  </head>
+
+  <body style="font-family: 'Montserrat', sans-serif;">
+    <div id="welcome" class="welcome" >Добро пожаловать!</div>
+    <a href="http://127.0.0.1:8000/shop/"><div id="box1" class="box box1">Магазин</div></a>
+    <div class="box box2">Новости</div>
+    <div class="box box3">Другое</div>
+  </body>
+
+<script src="{% static 'djangoshop/js/box-change.js' %}"></script>
+
+</html>

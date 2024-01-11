@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block head %}
+<link rel="stylesheet" href="{% static 'payment/css/payment-success-fail.css' %}">
+{% endblock head %}
+
 {% block content %}
 
 <div class="container">
@@ -9,7 +13,7 @@
         <div class="col-md-5 ">
             <div class="message-box _success">
                 <i class="fa fa-check-circle" aria-hidden="true"></i>
-                <h2> Ваш платеж прошле успешно </h2>
+                <h2> Ваш платеж прошел успешно </h2>
                 <p>  Спасибо за ваш платеж. Мы свяжемся с вами <br>
                    в ближайшее время </p>
             </div>
