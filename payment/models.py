@@ -47,7 +47,8 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
-    discount = models.IntegerField(validators=[MaxValueValidator(0), MaxValueValidator(100)])
+    discount = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     class Meta:
         verbose_name = "Order"

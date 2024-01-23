@@ -1,12 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
-
+from django.contrib import messages
 from .models import Category, ProductProxy
 
-
-# def products_view(request):
-#     product = ProductProxy.objects.all()
-#     return render(request, 'shop/products.html', {'products': product})
 
 class ProductListView(ListView):
     model = ProductProxy
@@ -19,8 +15,27 @@ class ProductListView(ListView):
         return "shop/products.html"
 
 def product_detail_view(request, slug):
-    product = get_object_or_404(ProductProxy, slug=slug)
-    return render(request, 'shop/product_detail.html', {'product': product})
+    product = get_object_or_404(
+        ProductProxy.objects.select_related('category'), slug=slug)
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            if product.reviews.filter(created_by=request.user).exists():
+                messages.error(
+                    request, 'Вы уже оставляли отзыв на этот продукт')
+            else:
+                rating = request.POST.get('rating', 3)
+                content = request.POST.get('content', '')
+                if content:
+                    product.reviews.create(
+                        rating=rating, content=content, created_by=request.user, product=product)
+                    return redirect(request.path)
+        else:
+            messages.error(
+                request, 'Вы должны быть авторизованы, чтобы оставить отзыв')
+
+    context = {'product': product}
+    return render(request, 'shop/product_detail.html', context)
 
 
 def categories_list(request, slug):
