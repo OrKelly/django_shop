@@ -13,7 +13,6 @@
     <title>{% block title %}KernShop{% endblock %}</title>
    <!--Custom CSS -->
     <link rel="stylesheet" href="{% static 'shop/css/layout.css' %}">
-    <link rel="stylesheet" href="{% static 'fonts/montserrat:wght@300,400,500.css' %}"/>
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/png" href="{% static 'shop/images/favicon.ico' %}" >
     {% block head %} {% endblock head %}
@@ -24,6 +23,7 @@
      <!-- Navbar -->
     {% include 'shop/_partials/_navbar.html' %}
 
+     {% include 'shop/_partials/_messages.html' %}
     <main>
       <!-- Content -->
       {% block content %} {% endblock %}
@@ -34,4 +34,5 @@
 
   <!-- Script -->
   <script src="{% static 'shop/js/base.js' %}"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
 </html>

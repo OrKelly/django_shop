@@ -1,6 +1,7 @@
 import random
 import string
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
@@ -48,26 +49,47 @@ class Product(models.Model):
     brand = models.CharField('Бренд', max_length=250)
     description = models.TextField('Описание', blank=True)
     price = models.DecimalField('Цена', max_digits=7, decimal_places=2, default=999.99)
-    image = models.ImageField('Изображение', upload_to='products/products/%Y/%m/%d')
-    available = models.BooleanField('Наличие', default=True)
+    image = models.ImageField('Изображение', upload_to='images/products/%Y/%m/%d', default='images/products/default.jpg')
+    available = models.BooleanField('Наличие', default=True, db_index=True)
     slug = models.SlugField('URL', max_length=250)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
+    discount = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     class Meta:
-        verbose_name = 'Товар'
-        verbose_name_plural = 'Товары'
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(rand_slug() + self.title)
         super(Product, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.title
-
     def get_absolute_url(self):
-        return reverse('shop:product-detail', kwargs={'slug': self.slug})
+        return reverse("shop:product-detail", args=[str(self.slug)])
+
+    def get_discounted_price(self):
+        """
+        Calculates the discounted price based on the product's price and discount.
+
+        Returns:
+            decimal.Decimal: The discounted price.
+        """
+        discounted_price = self.price - (self.price * self.discount / 100)
+        return round(discounted_price, 2)
+
+    @property
+    def full_image_url(self):
+        """
+        Returns:
+            str: The full image URL.
+        """
+        return self.image.url if self.image else ''
 
 
 class ProductManager(models.Manager):
