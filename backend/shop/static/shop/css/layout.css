@@ -12,6 +12,11 @@
         border-radius: 9px;
       }
 
+        .sales {
+            overflow-x: scroll;
+            display: flex;
+        }
+
       .label-warning[href],
       .badge-warning[href] {
         background-color: #c67605;

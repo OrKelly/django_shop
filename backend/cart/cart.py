@@ -27,6 +27,7 @@ class Cart():
 
         for product in products:
             cart[str(product.id)]['product'] = product
+            cart[str(product.id)]['product_pk'] = product.pk
 
         for item in cart.values():
             item['price'] = Decimal(item['price'])

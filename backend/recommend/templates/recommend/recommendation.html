@@ -62,38 +62,44 @@
 </style>
 
 <div class="reviews-container">
-    <h2 class="reviews-title">Reviews</h2>
+    {% if not product.get_rating %}
+    <h2 class="reviews-title">У этого товара пока слишком мало оценок</h2>
+    {% else %}
+    <h2 class="reviews-title">Рейтинг - {{ product.get_rating }}</h2>
+    <h2 class="reviews-title">Отзывы</h2>
+    {% endif %}
 
-    {% if request.user.is_authenticated %}
+    {% if buyer and not check_reviews %}
     <form method="post" class="review-form">
         {% csrf_token %}
         <div>
-            <label for="rating">Rating</label><br>
+            <label for="rating">Оценка</label><br>
             <select name="rating" id="rating">
                 <option value="1">1</option>
                 <option value="2">2</option>
-                <option value="3" selected>3</option>
+                <option value="3" Оценка>3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
             </select>
         </div>
         <div>
-            <label for="content">Comment</label><br>
+            <label for="content">Отзыв</label><br>
             <textarea name="content" id="content" rows="5" cols="50"></textarea>
         </div>
         <div>
-            <button>Submit</button>
+            <button>Отправить</button>
         </div>
     </form>
     {% endif %}
 
     {% for review in product.reviews.all %}
+
     <div class="d-flex flex-row bd-highlight mb-3 justify-content-between review " id="review-{{ review.id }}">
         <div>
-            <strong>Date:</strong> {{ review.created_at|date:"Y-m-d" }}<br>
+            <strong>Дата:</strong> {{ review.created_at|date:"Y-m-d" }}<br>
             <br>
-            <strong>Rating:</strong> {{ review.rating }}/5<br>
-            <strong>Comment:</strong><br>
+            <strong>Рейтинг:</strong> {{ review.rating }}/5<br>
+            <strong>Отзыв:</strong><br>
             {{ review.content }}
         </div>
        {%  comment %}

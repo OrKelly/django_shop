@@ -10,7 +10,17 @@
         <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
             <div class="card shadow-sm h-100">
                 {% thumbnail product.image "400x400" as im %}
-                <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
+                    <div style="position: relative">
+                              {% if product.discount %}
+                    <div class="sale" style="background-color: green; width: max-content; color: white;
+                border-radius: 5px; margin: 5px; font-size: 20px; padding: 5px; position: absolute">SALE {{ product.discount }}%</div>
+                    {% endif %}
+                {% if product.get_rating %}
+                    <div class="rating" style="position: absolute; right: 0px; margin: 5px; margin-left: auto; background-color: gold
+; border-radius: 5px; padding: 5px">&#9733; {{ product.get_rating }}</div>
+                {% endif %}
+                    <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
+                    </div>
                 {% endthumbnail %}
                 <div class="card-body">
                     <p class="card-text">
@@ -18,7 +28,8 @@
                     </p>
                     <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
                         style="width: 6rem">
-                        <h5>$ {{product.price}}</h5>
+                        <span class="text-decoration-line-through fw-bold text-danger"><h5>{{product.price}}</h5></span>
+                        <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{product.get_discounted_price}}</h3></span>
                     </div>
                 </div>
             </div>

@@ -3,8 +3,10 @@ import string
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils.text import slugify
 from django.urls import reverse
+
 
 
 def rand_slug():
@@ -50,7 +52,7 @@ class Product(models.Model):
     description = models.TextField('Описание', blank=True)
     price = models.DecimalField('Цена', max_digits=7, decimal_places=2, default=999.99)
     image = models.ImageField('Изображение', upload_to='images/products/%Y/%m/%d', default='images/products/default.jpg')
-    available = models.BooleanField('Наличие', default=True, db_index=True)
+    available = models.IntegerField('Наличие', default=10, blank=False, null=True)
     slug = models.SlugField('URL', max_length=250)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
@@ -65,10 +67,20 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    def get_rating(self):
+        count = self.reviews.count()
+        if count > 0:
+            sum = int(list(self.reviews.aggregate(Sum('rating')).values())[0])
+            return round(float(sum/count),2)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(rand_slug() + self.title)
         super(Product, self).save(*args, **kwargs)
+
+    def lower_available(self, quantity):
+        self.available -= quantity
+        return self.available
 
     def get_absolute_url(self):
         return reverse("shop:product-detail", args=[str(self.slug)])
@@ -94,7 +106,7 @@ class Product(models.Model):
 
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super(ProductManager, self).get_queryset().filter(available=True)
+        return super(ProductManager, self).get_queryset().filter(available__gt=0)
 
 class ProductProxy(Product):
 

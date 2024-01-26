@@ -24,3 +24,4 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.created_by} on Product: {self.product}"
+

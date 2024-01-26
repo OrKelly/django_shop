@@ -19,6 +19,8 @@ from .models import ShippingAddress, Order, OrderItem
 from yookassa import Configuration, Payment
 from django.conf import settings
 
+from shop.models import ProductProxy
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION
 
@@ -145,26 +147,16 @@ def complete_order(request):
 
 
 def payment_success(request):
+    cart = Cart(request)
+    for item in cart:
+        order_item = ProductProxy.objects.filter(id=item['product_pk']).first()
+        order_item.lower_available(quantity=item['qty'])
+        order_item.save()
     for key in list(request.session.keys()):
-        del request.session[key]
+        if key == 'session_key':
+            del request.session[key]
     return render(request, 'payment/payment-success.html')
 
 def payment_failed(request):
     return render(request, 'payment/payment-fail.html')
 
-
-# @staff_member_required
-# def admin_order_pdf(request, order_id):
-#     try:
-#         order = Order.objects.select_related('user', 'shipping_address').get(id=order_id)
-#     except Order.DoesNotExist:
-#         raise Http404('Заказ не найден')
-#     html = render_to_string('payment/order/pdf/pdf_invoice.html',
-#                             {'order': order})
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = f'filename=order_{order.id}.pdf'
-#     css_path = static('payment/css/pdf.css').lstrip('/')
-#     # css_path = 'static/payment/css/pdf.css'
-#     stylesheets = [weasyprint.CSS(css_path)]
-#     weasyprint.HTML(string=html).write_pdf(response, stylesheets=stylesheets)
-#     return response

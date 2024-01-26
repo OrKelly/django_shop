@@ -1,25 +1,19 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
+
 {% load thumbnail %}
-
-{% load static %}
-
 
 {% block content %}
 
 
-<main>
+<section class="album py-5 bg-light">
+  <div class="container">
+    <div class="pb-3 h5">Найденные товары:</div>
 
-  <div class="album py-5 bg-light">
-    <div class="container">
+    <hr />
 
-      <div class="pb-3 h5"> {{category.name|capfirst}} </div>
+    <br />
 
-
-      <hr>
-
-      <br>
-
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
         {% for product in products %}
             <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
             <div class="card shadow-sm h-100">
@@ -49,13 +43,4 @@
         </a>
     {% endfor %}
     </div>
-
-
-      </div>
-    </div>
-  </div>
-
-
-</main>
-
 {% endblock %}
