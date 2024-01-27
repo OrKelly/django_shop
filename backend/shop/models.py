@@ -58,6 +58,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
     discount = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    rating = models.DecimalField('Рейтинг', null=True, blank=True, max_digits=3, decimal_places=2)
 
     class Meta:
         verbose_name = 'Продукт'
@@ -71,7 +72,8 @@ class Product(models.Model):
         count = self.reviews.count()
         if count > 0:
             sum = int(list(self.reviews.aggregate(Sum('rating')).values())[0])
-            return round(float(sum/count),2)
+            self.rating = round(float(sum/count),2)
+            return self.rating
 
     def save(self, *args, **kwargs):
         if not self.slug:

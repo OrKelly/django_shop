@@ -1,14 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, F, Count
+from django.db.models.functions import Round
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django_email_verification import send_email
 
-User = get_user_model()
 
 from .forms import UserCreateForm, LoginForm, UserUpdateForm
+from payment.models import Order, ShippingAddress
+from payment.forms import ShippingAddressForm
 
+
+User = get_user_model()
 
 def register_user(request):
     if request.method == 'POST':
@@ -70,19 +75,35 @@ def logout_user(request):
 
 @login_required(login_url='account:login')
 def dashboard_user(request):
-    return render(request, 'account/dashboard/dashboard.html')
+    orders = Order.objects.select_related('user').aggregate(summ=Round(Sum(F('amount'))), total=Count('id'))
+    user_orders = Order.objects.select_related('user').order_by('created')
+    try:
+        shipping_address = ShippingAddress.objects.get(user=request.user)
+    except ShippingAddress.DoesNotExist:
+        shipping_address = None
+    form = ShippingAddressForm(instance=shipping_address)
+
+    if request.method == 'POST':
+        form = ShippingAddressForm(request.POST, instance=shipping_address)
+        if form.is_valid():
+            shipping_address = form.save(commit=False)
+            shipping_address.user = request.user
+            shipping_address.save()
+            return redirect('account:dashboard')
+
+    return render(request, 'account/dashboard/dashboard.html', {'orders':orders, 'form':form, 'user_orders':user_orders})
 
 
 @login_required(login_url='account:login')
 def profile_user(request):
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
+        form = UserUpdateForm(request.POST)
 
         if form.is_valid():
             form.save()
             return redirect('account:dashboard')
     else:
-        form = UserUpdateForm(instance=request.user)
+        form = UserUpdateForm(request.GET)
     context = {
         'form':form
     }

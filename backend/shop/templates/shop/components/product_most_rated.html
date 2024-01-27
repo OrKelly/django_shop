@@ -1,0 +1,32 @@
+{% load thumbnail %}
+
+<section class="album py-5 bg-light">
+  <div class="container">
+      <div class="pb-3 h5" style="font-size: 20px; color: black; background-color: gold; border-radius: 5px;
+padding: 5px; width: max-content">Рекомендуем</div>
+      <span class="sales" style="overflow-x: scroll;
+            display: flex;">
+      {% for product in prods %}
+          <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
+            <div class="card shadow-sm h-100" style="width: 400px">
+                {% thumbnail product.image "400x400" as im %}
+                <div class="rating" style="position: absolute; right: 0px; margin: 5px; margin-left: auto; background-color: gold
+; border-radius: 5px; padding: 5px">&#9733; {{ product.rating }}</div>
+                    <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
+                {% endthumbnail %}
+                <div class="card-body">
+                    <p class="card-text">
+                        {{product.title|capfirst}}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
+                        style="width: 8rem">
+                        <span class="text-decoration-line-through fw-bold text-danger"><h5>{{product.price}}</h5></span>
+                        <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{product.get_discounted_price}}</h3></span>
+                    </div>
+                </div>
+            </div>
+        </a>
+      {% endfor %}
+      </span>
+    <br>
+    <br>

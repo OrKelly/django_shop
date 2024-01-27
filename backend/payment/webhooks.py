@@ -42,6 +42,7 @@ def stripe_webhook(request):
             send_order_confirmation.delay(order_id)
             order = Order.objects.get(id=order_id)
             order.paid = True
+            order.status = 'Оплачен'
             order.save()
 
     return HttpResponse(status=200)

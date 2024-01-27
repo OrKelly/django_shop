@@ -1,24 +1,18 @@
-{% load thumbnail%}
-{% for product in products %}
+{% load thumbnail %}
 
-{% if forloop.last %}
-<div class="col" hx-get="{% url 'shop:products' %}?page={{ page_obj.number|add:1 }}" hx-trigger="revealed"
-    hx-swap="afterend">
-    {% else %}
-    <div class="col">
-        {% endif %}
-        <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
-            <div class="card shadow-sm h-100">
+<section class="album py-5 bg-light">
+  <div class="container">
+      <div class="pb-3 h5"><a href="{% url 'shop:sales' %}" style="font-size: 20px; color: white; background-color: red; border-radius: 5px;
+padding: 5px">Акции</a></div>
+      <span class="sales" style="overflow-x: scroll;
+            display: flex;">
+      {% for product in prods %}
+          <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
+            <div class="card shadow-sm h-100" style="width: 400px">
                 {% thumbnail product.image "400x400" as im %}
                     <div style="position: relative">
-                              {% if product.discount %}
                     <div class="sale" style="background-color: green; width: max-content; color: white;
-                border-radius: 5px; margin: 5px; font-size: 20px; padding: 5px; position: absolute">SALE {{ product.discount }}%</div>
-                    {% endif %}
-                {% if product.rating %}
-                    <div class="rating" style="position: absolute; right: 0px; margin: 5px; margin-left: auto; background-color: gold
-; border-radius: 5px; padding: 5px">&#9733; {{ product.rating }}</div>
-                {% endif %}
+                border-radius: 5px; margin: 5px; font-size: 15px; padding: 5px; position: absolute">SALE {{ product.discount }}%</div>
                     <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
                     </div>
                 {% endthumbnail %}
@@ -27,12 +21,14 @@
                         {{product.title|capfirst}}
                     </p>
                     <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
-                        style="width: 6rem">
+                        style="width: 8rem">
                         <span class="text-decoration-line-through fw-bold text-danger"><h5>{{product.price}}</h5></span>
                         <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{product.get_discounted_price}}</h3></span>
                     </div>
                 </div>
             </div>
         </a>
-    </div>
-{% endfor %}
+      {% endfor %}
+      </span>
+    <br>
+    <br>

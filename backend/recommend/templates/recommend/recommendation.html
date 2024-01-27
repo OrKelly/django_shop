@@ -62,10 +62,10 @@
 </style>
 
 <div class="reviews-container">
-    {% if not product.get_rating %}
+    {% if not product.rating %}
     <h2 class="reviews-title">У этого товара пока слишком мало оценок</h2>
     {% else %}
-    <h2 class="reviews-title">Рейтинг - {{ product.get_rating }}</h2>
+    <h2 class="reviews-title">Рейтинг - {{ product.rating }}</h2>
     <h2 class="reviews-title">Отзывы</h2>
     {% endif %}
 
@@ -97,6 +97,7 @@
     <div class="d-flex flex-row bd-highlight mb-3 justify-content-between review " id="review-{{ review.id }}">
         <div>
             <strong>Дата:</strong> {{ review.created_at|date:"Y-m-d" }}<br>
+            <strong>От:</strong> {{review.created_by }}<br>
             <br>
             <strong>Рейтинг:</strong> {{ review.rating }}/5<br>
             <strong>Отзыв:</strong><br>

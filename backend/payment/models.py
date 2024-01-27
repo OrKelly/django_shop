@@ -21,12 +21,12 @@ class ShippingAddress(models.Model):
         User, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Shipping address"
-        verbose_name_plural = "Shipping addresses"
+        verbose_name = "Адрес достави"
+        verbose_name_plural = "Адреса доставки"
         ordering = ['-id']
 
     def __str__(self):
-        return "Shipping address" + " - " + self.full_name
+        return "Адресс" + " - " + self.full_name
 
     @classmethod
     def create_default_shipping_address(cls, user):
@@ -39,6 +39,15 @@ class ShippingAddress(models.Model):
 
 
 class Order(models.Model):
+    CHOICES = (
+        ('Не оплачен', 'Не оплачен'),
+        ('Оплачен', 'Оплачен'),
+        ('Подтвержден', 'Подтвержден'),
+        ('В пути', 'В пути'),
+        ('Доставлен', 'Доставлен'),
+        ('Отменен', 'Отменен'),
+    )
+
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, null=True)
     shipping_address = models.ForeignKey(
@@ -49,10 +58,11 @@ class Order(models.Model):
     paid = models.BooleanField(default=False)
     discount = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    status = models.CharField(max_length=100, choices=CHOICES, default='Не оплачен')
 
     class Meta:
-        verbose_name = "Order"
-        verbose_name_plural = "Orders"
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
         ordering = ['-created']
         indexes = [
             models.Index(fields=['-created']),
@@ -90,7 +100,7 @@ class OrderItem(models.Model):
         User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return "Item" + str(self.id)
+        return "Товар" + str(self.id)
 
     def get_cost(self):
         return self.price * self.quantity

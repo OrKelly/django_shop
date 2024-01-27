@@ -18,14 +18,11 @@ class ProductListView(ListView):
 
 class SalesListView(ListView):
     context_object_name = 'products'
-
+    template_name = 'shop/search_products.html'
     def get_queryset(self):
         sales = ProductProxy.objects.filter(discount__gt=0).order_by('-discount')
         return sales
-    def get_template_names(self):
-        if self.request.htmx:
-            return "shop/components/product_list.html"
-        return "shop/search_products.html"
+
 
 
 def product_detail_view(request, slug):
@@ -51,6 +48,8 @@ def product_detail_view(request, slug):
                     if content:
                         product.reviews.create(
                             rating=rating, content=content, created_by=request.user, product=product)
+                        product.get_rating()
+                        product.save()
                         return redirect(request.path)
             else:
                 messages.error(

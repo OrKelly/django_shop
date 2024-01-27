@@ -20,8 +20,10 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.created_by} on Product: {self.product}"
+        return f"{self.created_by} на товар: {self.product}"
 

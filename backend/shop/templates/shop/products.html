@@ -1,43 +1,15 @@
 {% extends 'layout.html' %}
 
 {% load thumbnail %}
+{% load shoptags %}
+
 
 {% block content %}
 
 
-<section class="album py-5 bg-light">
-  <div class="container">
-      <div class="pb-3 h5"><a href="{% url 'shop:sales' %}">Акции</a></div>
-      <span class="sales" style="overflow-x: scroll;
-            display: flex;">
-      {% for product in products %}
-      {% if product.discount %}
-          <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
-            <div class="card shadow-sm h-100" style="width: 400px">
-                {% thumbnail product.image "400x400" as im %}
-                    <div style="position: relative">
-                    <div class="sale" style="background-color: green; width: max-content; color: white;
-                border-radius: 5px; margin: 5px; font-size: 15px; padding: 5px; position: absolute">SALE {{ product.discount }}%</div>
-                    <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
-                    </div>
-                {% endthumbnail %}
-                <div class="card-body">
-                    <p class="card-text">
-                        {{product.title|capfirst}}
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
-                        style="width: 8rem">
-                        <span class="text-decoration-line-through fw-bold text-danger"><h5>{{product.price}}</h5></span>
-                        <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{product.get_discounted_price}}</h3></span>
-                    </div>
-                </div>
-            </div>
-        </a>
-      {% endif %}
-      {% endfor %}
-      </span>
-    <br>
-    <br>
+    {% get_sale_products %}
+
+    {% get_most_rated_products %}
 
     <div class="pb-3 h5">Все продукты</div>
 

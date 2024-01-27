@@ -3,18 +3,68 @@
 {% load static %}
 
 
-
 {% block content %}
-
+{% load crispy_forms_tags %}
     <br>
-    <div class="container bg-white shadow-md p-3">
-        <h4>Добро пожаловать, {{ user.username }}!</h4>
+    <div class="container bg-white shadow-md p-3" style="align-items: center; text-align: center; align-content: center; border: 1px black solid;
+border-radius: 5px">
+        <h1>Добро пожаловать, {{ user.username }}!</h1>
 
         <hr>
 
-        <h6>Персональная информация</h6>
-
-        <a href="{% url 'account:logout' %}">
+        <div class="spended-summ" style="display: flex; left: 50%;margin-left: 20%;">
+        <h6 style='background-color: lightgrey; padding: 5px; border-radius: 5px; font-size: 30px'>Общая сумма всех заказов: {{ orders.summ }}</h6>
+        <h6 style='background-color: lightgrey; margin-left: 30px;padding: 5px; border-radius: 5px; font-size: 30px'>Количество заказов: {{ orders.total }}</h6>
+        </div>
+        <hr>
+        <div class="container" style="margin-top: 15px">
+        <div class="row">
+            <div class="col">
+        <h4>Заполните ваш адрес:</h4>
+         <form method="post" style="width: max-content; margin: 30px; text-align: center; left: 50%;margin-left: 40%;">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-secondary w-100 btn-block p-2 btn-register">Сохранить</button>
+    </form>
+        </div>
+                <div class="col" style="overflow-y: scroll">
+                     <table class="table table-bordered">
+                        <thead>
+                        <td>
+                            <h5>Номер заказа</h5>
+                        </td>
+                        <td>
+                            <h5>Дата оформления</h5>
+                        </td>
+                        <td>
+                            <h5>Сумма</h5>
+                        </td>
+                        <td>
+                            <h5>Статус</h5>
+                        </td>
+                        </thead>
+                         {% for order in user_orders %}
+                             <tr>
+                                 <a href="{% url 'payment:order_detail_view' order.pk %}">
+                             <td>
+                                 <a href="{% url 'payment:order_detail_view' order.pk %}">{{ order.pk }}
+                             </td>
+                             <td>
+                                 {{ order.created }}
+                             </td>
+                             <td>
+                                 {{ order.amount }}
+                             </td>
+                             <td>
+                                 {{ order.status }}
+                             </td>
+                             </tr>
+                         {% endfor %}
+                     </table>
+                </div>
+        </div>
+            </div>
+            <a href="{% url 'account:logout' %}">
         <button class="btn btn-primary">
             Выйти
             </button>
@@ -25,7 +75,7 @@
                 Обновить аккаунт
                 </button>
             </a>
-        
+
             <a href="{% url 'account:delete-user' %}">
                 <button class="btn btn-warning">
                     Удалить аккаунт
@@ -33,4 +83,6 @@
                 </a>
 
     </div>
+        </div>
+
 {% endblock %}

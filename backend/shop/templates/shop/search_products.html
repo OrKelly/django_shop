@@ -23,9 +23,9 @@
                     <div class="sale" style="background-color: green; width: max-content; color: white;
                 border-radius: 5px; margin: 5px; font-size: 20px; padding: 5px; position: absolute">SALE {{ product.discount }}%</div>
                     {% endif %}
-                {% if product.get_rating %}
+                {% if product.rating %}
                     <div class="rating" style="position: absolute; right: 0px; margin: 5px; margin-left: auto; background-color: gold
-; border-radius: 5px; padding: 5px">&#9733; {{ product.get_rating }}</div>
+; border-radius: 5px; padding: 5px">&#9733; {{ product.rating }}</div>
                 {% endif %}
                     <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
                     </div>
@@ -36,7 +36,12 @@
                     </p>
                     <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
                         style="width: 6rem">
+                        {% if product.discount %}
+                            <span class="text-decoration-line-through fw-bold text-danger"><h5>{{product.price}}</h5></span>
+                            <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{product.get_discounted_price}}</h3></span>
+                        {% else %}
                         <h5>{{product.price}}</h5>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -27,6 +27,7 @@ stripe.api_version = settings.STRIPE_API_VERSION
 Configuration.account_id = settings.YOOKASSA_SHOP_ID
 Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
+
 @login_required
 def shipping(request):
     try:
@@ -43,7 +44,8 @@ def shipping(request):
             shipping_address.user = request.user
             shipping_address.save()
             return redirect('account:dashboard')
-    return render(request, 'payment/shipping.html', {'form':form})
+    return render(request, 'payment/shipping.html', {'form': form})
+
 
 @login_required
 def checkout(request):
@@ -52,6 +54,7 @@ def checkout(request):
         if shipping_address:
             return render(request, 'payment/checkout.html', {'shipping_address': shipping_address})
     return render(request, 'payment/checkout.html')
+
 
 @login_required
 def complete_order(request):
@@ -112,38 +115,44 @@ def complete_order(request):
                 return redirect('account:login')
 
         elif payment_type == "yookassa-payment":
-                idempotence_key = uuid.uuid4()
-                currency = 'RUB'
-                description = 'Товары в корзине'
-                payment = Payment.create({
-                    "amount": {
-                        "value": total_price,
-                        "currency": currency
-                    },
-                    "confirmation": {
-                        "type": "redirect",
-                        "return_url": request.build_absolute_uri(reverse('payment:payment-success')),
-                    },
-                    "capture": True,
-                    "test": True,
-                    "description": description,
-                }, idempotence_key)
+            idempotence_key = uuid.uuid4()
+            currency = 'RUB'
+            description = 'Товары в корзине'
+            payment = Payment.create({
+                "amount": {
+                    "value": total_price,
+                    "currency": currency
+                },
+                "confirmation": {
+                    "type": "redirect",
+                    "return_url": request.build_absolute_uri(reverse('payment:payment-success')),
+                },
+                "capture": True,
+                "test": True,
+                "description": description,
+            }, idempotence_key)
 
-                confirmation_url = payment.confirmation.confirmation_url
+            confirmation_url = payment.confirmation.confirmation_url
 
-                if request.user.is_authenticated:
-                    order = Order.objects.create(
-                        user=request.user, shipping_address=shipping_address, amount=total_price)
+            if request.user.is_authenticated:
+                order = Order.objects.create(
+                    user=request.user, shipping_address=shipping_address, amount=total_price)
 
-                    for item in cart:
-                        OrderItem.objects.create(
-                            order=order, product=item['product'], price=item['price'], quantity=item['qty'],
-                            user=request.user)
+                for item in cart:
+                    OrderItem.objects.create(
+                        order=order, product=item['product'], price=item['price'], quantity=item['qty'],
+                        user=request.user)
 
-                    return redirect(confirmation_url)
+                return redirect(confirmation_url)
 
-                else:
-                    return redirect('account:login')
+            else:
+                return redirect('account:login')
+
+
+@login_required
+def order_detail_view(request, order_id):
+    order = Order.objects.filter(pk=order_id).first()
+    return render(request, 'order/order_detail.html', {'order': order})
 
 
 def payment_success(request):
@@ -157,6 +166,6 @@ def payment_success(request):
             del request.session[key]
     return render(request, 'payment/payment-success.html')
 
+
 def payment_failed(request):
     return render(request, 'payment/payment-fail.html')
-
