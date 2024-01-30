@@ -37,11 +37,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'drf_yasg',
+    'django_simple_coupons',
 
     #apps
     'shop',
     'cart',
     'account',
+    'staff',
     'payment',
     'recommend',
     'api',
@@ -238,3 +240,5 @@ DJOSER = {
     'AUTH_HEADER_TYPES': ('JWT',),
 
 }
+
+DSC_COUPON_CODE_LENGTH = 16

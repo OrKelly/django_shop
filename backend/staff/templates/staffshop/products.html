@@ -1,0 +1,21 @@
+{% extends 'staff_layout.html' %}
+
+{% load thumbnail %}
+
+
+{% block content %}
+
+
+    <div class="pb-3 h5" style="margin-left: 100px; margin-top: 40px">Все продукты</div>
+
+    <hr />
+
+    <br />
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" style="margin: 100px 100px">
+
+      {% include 'staffshop/components/product_list.html' %}
+    </div>
+  </div>
+</section>
+{% endblock %}

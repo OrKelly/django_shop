@@ -1,0 +1,46 @@
+{% extends 'staff_layout.html' %}
+
+{% block content %}
+<div class="col" style="width: 1200px; margin-top: 40px; margin-left: 800px">
+<h3>Активные заказы</h3>
+<hr>
+                     <table class="table table-bordered" style="overflow-y: scroll">
+                        <thead>
+                        <td>
+                            <h5>Номер заказа</h5>
+                        </td>
+                        <td>
+                            <h5>Дата оформления</h5>
+                        </td>
+                        <td>
+                            <h5>Сумма</h5>
+                        </td>
+                        <td>
+                            <h5>Заказчик</h5>
+                        </td>
+                        <td>
+                            <h5>Статус</h5>
+                        </td>
+                        </thead>
+                         {% for order in orders %}
+                             <tr>
+                             <td>
+                                 <a href="{% url 'staff:order_detail' order.pk %}">{{ order.pk }}</a>
+                             </td>
+                             <td>
+                                 {{ order.created }}
+                             </td>
+                             <td>
+                                 {{ order.amount }}
+                             </td>
+                                 <td>
+                                     {{ order.user.username }}
+                                 </td>
+                             <td>
+                                 {{ order.status }}
+                             </td>
+                         {% endfor %}
+                     </table>
+</div>
+
+{% endblock content %}

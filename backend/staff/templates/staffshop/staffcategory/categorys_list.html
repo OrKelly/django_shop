@@ -1,0 +1,11 @@
+{% extends 'staff_layout.html' %}
+
+{% block content %}
+<div class="col" style="width: 1200px; margin-top: 40px; margin-left: 800px">
+    <h3>Категории</h3>
+    <hr>
+    {% for cat in cats %}
+        <p>{{ cat.name }}</p>
+    {% endfor %}
+</div>
+{% endblock content %}

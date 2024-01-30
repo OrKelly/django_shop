@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% load static %}
-
+{% load thumbnail %}
 {% block content %}
 
 <div class="container">
@@ -12,7 +12,9 @@
 
             <div class="col-md-5 col-lg-5 order-md-first bg-light">
 
-                <img class="img-fluid mx-auto d-block" alt="Responsive image" src="{{product.image.url}}"> <!-- Product image -->
+                {% thumbnail product.image "400x400" as im %}
+                    <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
+                {% endthumbnail %}
 
             </div>
 

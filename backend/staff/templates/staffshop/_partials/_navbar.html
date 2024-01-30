@@ -1,0 +1,60 @@
+<nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light p-3 shadow-sm ">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'shop:products' %}"><i class="fa-solid fa-shop me-2"></i>
+            <strong>Kern Shop</strong></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <form action="{% url 'shop:search-products' %}" method="get">
+            <div class="mx-auto my-3 d-lg-none d-sm-block d-xs-block">
+            <div class="input-group">
+                <span class="border-success input-group-text bg-success text-white"><i
+                        class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" name="q" placeholder="Например Samsung..." class="form-control border-success" style="color: #7a7a7a" />
+                <button class="btn btn-success text-dark search-button">Поиск</button>
+            </div>
+        </div>
+    </form>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <form action="{% url 'shop:search-products' %}" method="get">
+            <div class="ms-auto d-none d-lg-block">
+                <div class="input-group">
+                    <span class="border-success input-group-text text-white search-button"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" name="q" placeholder="Например Samsung..." class="form-control border-success" style="color: #7a7a7a" />
+                    <button class="btn btn-success text-dark search-button">Поиск</button>
+                </div>
+            </div>
+        </form>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:cat_list' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Категории</a
+              >
+            </li>
+              <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:active_orders' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Активные заказы</a
+              >
+            </li>
+              <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:completed_orders' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Завершенные заказы</a
+              >
+            </li>
+              <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:products' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Все товары</a
+              >
+            </li>
+              <li class="nav-item">
+                <a class="nav-link mx-2 text-uppercase" href="{% url 'account:logout' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Выход</a
+              >
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>

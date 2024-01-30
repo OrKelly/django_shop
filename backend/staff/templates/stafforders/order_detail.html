@@ -1,0 +1,64 @@
+{% extends 'staff_layout.html' %}
+
+{% load static %}
+{% load thumbnail %}
+{% block content %}
+<div class="container" style="display: flex">
+    <div class="row" style="max-width: 400px; margin-top: 15px; text-align: center; overflow-y: scroll;">
+        <div class="col">
+            <h2>Товары:</h2>
+            {% for item in order.items.all %}
+                <div class="card shadow-sm h-100">
+                {% thumbnail item.product.image "400x400" as im %}
+                    <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
+                {% endthumbnail %}
+                <div class="card-body">
+                    <p class="card-text">
+                        {{item.product.title|capfirst}}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center badge search-button text-wrap text-dark"
+                        style="width: 6rem">
+                        <span class="text-decoration-line-through fw-bold text-danger"><h5>{{item.product.price}}</h5></span>
+                        <span class="h6 fw-bold" style="margin-left: 40px"><h3>{{item.product.get_discounted_price}}</h3></span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row" style="margin-top: 15px; margin-left: 40px; width: auto">
+        <div class="col">
+            <h2>Заказ №{{ order.pk }}</h2>
+            <hr>
+                <div class="container bg-white shadow-md p-3" style="align-items: center; text-align: center; align-content: center; border: 1px black solid;
+border-radius: 5px">
+                    <h4>Номер заказа: {{ order.pk }}</h4>
+                    <h4>Адрес доставки: {{ order.shipping_address.country }}, г.{{ order.shipping_address.city }},
+                        ул.{{ order.shipping_address.street_address }}, д.{{ order.shipping_address.apartment_address }}
+                    </h4>
+                    <h4>Дата создания: {{ order.created }}</h4>
+                    <h4>Сумма: {{ order.amount }}</h4>
+                    <h4>Количество товаров: {{ order.items.count }}</h4>
+                    <h4>Статус: - {{ order.status }}</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if order.status == 'Оплачен' %}
+                        <button type="submit" class='btn btn-primary'>Подтвердить</button>
+                        {% elif order.status == 'Подтвержден' %}
+                        <button type="submit" class='btn btn-primary'>В пути</button>
+                        {% elif order.status == 'В пути' %}
+                        <button type="submit" class='btn btn-success'>Завершить</button>
+                            {% elif order.status == 'Отменен'%}
+                            <button type="submit" class='btn btn-danger' disabled>Отменен</button>
+                        {% else %}
+                        <button type="submit" class='btn btn-success' disabled>Завершен</button>
+                        {% endif %}
+                        {% if order.status != 'Доставлен' and order.status != 'Отменен'  %}
+                            <a href="{% url "staff:order_cancel" order.pk %}" class='btn btn-danger'>Отмена</a>
+                        {% endif %}
+                    </form>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

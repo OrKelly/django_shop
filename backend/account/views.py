@@ -75,8 +75,8 @@ def logout_user(request):
 
 @login_required(login_url='account:login')
 def dashboard_user(request):
-    orders = Order.objects.select_related('user').aggregate(summ=Round(Sum(F('amount'))), total=Count('id'))
-    user_orders = Order.objects.select_related('user').order_by('created')
+    orders = Order.objects.select_related('user').filter(user=request.user).aggregate(summ=Round(Sum(F('amount'))), total=Count('id'))
+    user_orders = Order.objects.select_related('user').filter(user=request.user).order_by('created')
     try:
         shipping_address = ShippingAddress.objects.get(user=request.user)
     except ShippingAddress.DoesNotExist:
