@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from shop.models import ProductProxy
 from django.http import JsonResponse
 from .cart import Cart
+from recommend.models import CouponProxy
+
 
 def cart_view(request):
     cart = Cart(request)
@@ -65,3 +67,14 @@ def cart_update(request):
 
         return response
 
+# def cart_promo(request):
+#     cart = Cart(request)
+#
+#     if request.POST.get('action') == 'post':
+#         coupon_code = str(request.POST.get('coupon_code'))
+#         coupon = get_object_or_404(CouponProxy, code=coupon_code)
+#         cart_total = cart.add_promo(coupon=coupon, discount=coupon.discount)
+#
+#         response = JsonResponse({'total': cart_total})
+#
+#         return response

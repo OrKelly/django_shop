@@ -49,7 +49,9 @@ services:
     volumes:
       - static_data:/app/static
     restart: always
-    command: celery -A ShopDjango worker --loglevel=info --beat
+    command: sh -c "celery -A ShopDjango worker --loglevel=info --beat &&
+                    celery -A ShopDjango flower"
+
 
   nginx:
     image: nginx:latest

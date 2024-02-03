@@ -1,16 +1,21 @@
+import stripe
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
+from django.utils.dateformat import format
+from django.conf import settings
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView
 from braces.views import GroupRequiredMixin
 
 from shop.models import Product
 from payment.models import Order
 from shop.models import Category
 
-from .tasks import send_cancel_order
-from .forms import ProductChangeForm
+from .tasks import send_cancel_order_mail, mail_sending
+from .forms import ProductChangeForm, MailSendingForm, CancelOrderForm, PromoCreatingForm
 
 
 def group_required(*group_names):
@@ -35,19 +40,37 @@ class ProductListView(LoginRequiredMixin,GroupRequiredMixin, ListView):
         return "staffshop/products.html"
 
 
-class CategoryListView(LoginRequiredMixin,GroupRequiredMixin, ListView):
-    context_object_name = 'cats'
+class ProductAddView(LoginRequiredMixin,GroupRequiredMixin, CreateView):
+    model = Product
     group_required = [u'staff', ]
-    template_name = 'staffcategory/cats.html'
+    success_url = reverse_lazy('staff:products')
+    form_class = ProductChangeForm
+    template_name = 'staffshop/product_change.html'
 
-    def get_queryset(self):
-        return Category.objects.all()
 
+def product_detail_view(request, slug):
+    product = get_object_or_404(
+        Product.objects.select_related('category'), slug=slug)
+    context = {'product': product}
+    return render(request, 'staffshop/product_detail.html', context)
+
+
+def search_products(request):
+    query = request.GET.get('q')
+    products = Product.objects.filter(title__icontains=query).distinct()
+    context = {'products': products}
+    if not query or not products:
+        messages.error(
+            request, 'К сожалению, нам ничего не удалось найти по вашему запросу!'
+        )
+        return redirect('staff:products')
+    return render(request, 'staffshop/search_products.html', context)
 
 class ActiveOrderListView(LoginRequiredMixin,GroupRequiredMixin, ListView):
     context_object_name = 'orders'
     group_required = [u'staff', ]
     template_name = 'stafforders/orders.html'
+    extra_context = {'title':'Активные заказы'}
 
     def get_queryset(self):
         return Order.objects.filter(status__in=['Оплачен', 'Подтвержден', 'В пути'])
@@ -57,6 +80,7 @@ class CompletedOrderListView(LoginRequiredMixin,GroupRequiredMixin, ListView):
     context_object_name = 'orders'
     group_required = [u'staff', ]
     template_name = 'stafforders/orders.html'
+    extra_context = {'title': 'Завершенные заказы'}
 
     def get_queryset(self):
         return Order.objects.filter(status__in=['Доставлен', 'Отменен'])
@@ -72,6 +96,7 @@ def order_detail(request, order_id):
             order.status = 'В пути'
         elif order.status == 'В пути':
             order.status = 'Доставлен'
+            order.complete_order()
         else:
             messages.error(
                 request, 'Заказ не оплачен, подтвердить можно только после оплаты!'
@@ -82,12 +107,17 @@ def order_detail(request, order_id):
 @group_required('staff')
 def order_cancel(request, order_id):
     order = Order.objects.filter(pk=order_id).first()
+    form = CancelOrderForm()
     if request.method == 'POST':
-        order.status = 'Отменен'
-        order.save()
-        send_cancel_order.delay(order_id)
-        return redirect('staff:order_detail', order_id=order_id)
-    return render(request, 'stafforders/order_cancel.html', {'order': order})
+        form = CancelOrderForm(request.POST)
+        if form.is_valid():
+            order.status = 'Отменен'
+            order.complete_order()
+            order.cancel_reason = form.cleaned_data['title']
+            order.save()
+            send_cancel_order_mail.delay(order_id, form)
+            return redirect('staff:order_detail', order_id=order_id)
+    return render(request, 'stafforders/order_cancel.html', {'order': order, 'form':form})
 
 
 @group_required('staff')
@@ -111,4 +141,34 @@ def delete_product(request, slug):
     return render(request, 'staffshop/product_delete.html', {'product':product})
 
 
+@group_required('staff')
+def email_sending(request):
+    form = MailSendingForm()
+    if request.method == 'POST':
+        form = MailSendingForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            mail = form.cleaned_data['mail']
+            mail_sending.delay(title, mail)
+            messages.success(request,
+                      'Рассылка успешно отправлена! Скоро получатели получат её!')
+    return render(request, 'mailing/mail_sender.html', {'form':form})
 
+@group_required('staff')
+def list_promo(request):
+    promos = stripe.PromotionCode.list()
+    return render(request, 'promo/promos.html', {'promos':promos})
+
+@group_required('staff')
+def add_promo(request):
+    form = PromoCreatingForm()
+    if request.method == 'POST':
+        form = PromoCreatingForm(request.POST)
+        if form.is_valid():
+            date = format(form.cleaned_data['expires_on'], 'U')
+            coupon = stripe.PromotionCode.create(
+                coupon=f'sale{form.cleaned_data["sale"]}',
+                expires_at=format(form.cleaned_data['expires_on'], 'U')
+            )
+            messages.success(request, f'Промокод {coupon.code} успешно создан!')
+    return render(request, 'promo/promo_form.html', {'form':form})

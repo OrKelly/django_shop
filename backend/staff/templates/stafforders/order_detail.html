@@ -37,6 +37,11 @@ border-radius: 5px">
                         ул.{{ order.shipping_address.street_address }}, д.{{ order.shipping_address.apartment_address }}
                     </h4>
                     <h4>Дата создания: {{ order.created }}</h4>
+                    {% if order.status == 'Доставлен' %}
+                    <h4>Доставлен: {{ order.completed }}</h4>
+                    {% elif order.status == 'Отменен' %}
+                    <h4>Отменен: {{ order.completed }}</h4>
+                    {% endif %}
                     <h4>Сумма: {{ order.amount }}</h4>
                     <h4>Количество товаров: {{ order.items.count }}</h4>
                     <h4>Статус: - {{ order.status }}</h4>

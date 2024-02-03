@@ -103,6 +103,7 @@
 
     </div>
 
+
     {% endwith %}
     {% endfor %}
 
@@ -113,6 +114,7 @@
           {{ cart.get_total_price }}
         </div>
       </div>
+
       <button
                   type="button"
                   class="btn btn-success btn-md text-bg-light mt-4"
@@ -178,6 +180,29 @@
         })
     });
 
+    {#$(document).on('submit', '#promo', function(e){#}
+    {#    e.preventDefault();#}
+    {##}
+    {#    var coupon_code = $('#coupon').val()#}
+    {##}
+    {#    $.ajax({#}
+    {#        type: 'POST',#}
+    {#        url: '{% url "cart:cart_promo" %}',#}
+    {#        data: {#}
+    {#            coupon_code: $('#coupon').val(),#}
+    {#            csrfmiddlewaretoken: '{{ csrf_token }}',#}
+    {#            action: 'post'#}
+    {#        },#}
+    {#        success: function(response){#}
+    {#            document.getElementById('total').textContent = response.total#}
+    {##}
+    {#            location.reload()#}
+    {#        },#}
+    {#        error: function(error, status){#}
+    {#            console.log(error)#}
+    {#        }#}
+    {#    })#}
+    {#});#}
 
 
 

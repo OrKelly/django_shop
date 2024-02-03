@@ -5,12 +5,19 @@
 
 {% block content %}
 
-
     <div class="pb-3 h5" style="margin-left: 100px; margin-top: 40px">Все продукты</div>
 
     <hr />
 
     <br />
+     <form action="{% url 'staff:search_products' %}" method="get" style="width: max-content; margin-left: 50px">
+            <div class="input-group rounded">
+              <input type="search" name="q" class="form-control rounded" placeholder="Поиск" aria-label="Search" aria-describedby="search-addon" />
+              <span class="input-group-text border-0" id="search-addon">
+                <button class="btn btn-secondary search-button">Поиск</button>
+              </span>
+            </div>
+        </form>
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" style="margin: 100px 100px">
 

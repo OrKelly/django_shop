@@ -7,16 +7,15 @@
 {% block content %}
 
 <div class="container bg-white shadow-md p-5 form-layout">
-
-    <h3>Отмена</h3>
-
+    
+    <h3>Промокод</h3>
+    
     <br>
 
     <form method="post">
         {% csrf_token %}
-        <h4>Вы уверены что хотите отменить заказ № {{ order.id }}? Это необратимо! </h4>
         {{ form|crispy }}
-        <button type="submit" class="btn btn-secondary w-100 btn-block p-2 btn-register">Отменить</button>
+        <button type="submit" class="btn btn-secondary w-100 btn-block p-2 btn-register">Создать</button>
     </form>
 
     <br>
@@ -36,13 +35,13 @@
         {% for message in messages %}
             <li class="{{ message.tags }}">
                 {{ message|safe }}
-
+                
             </li>
         {% endfor %}
     </ul>
 {% endif %}
 
-
+    
 </div>
 
 <br>

@@ -1,0 +1,66 @@
+{% extends 'staff_layout.html' %}
+
+{% load timestamp_to_time %}
+
+{% block content %}
+<div class="col" style="width: 1200px; margin-top: 40px; margin-left: 800px">
+<h3>Промокоды</h3>
+<hr>
+<div style="margin: 10px; text-align: center">
+    <a type="button" class="btn btn-outline-secondary" style="width: 400px; font-size: 25px" href="{% url 'staff:add_promo' %}">
+        Добавить промокод</a>
+</div>
+                     <table class="table table-bordered" style="overflow-y: scroll">
+                        <thead>
+                        <td>
+                            <h5>Промокод</h5>
+                        </td>
+                        <td>
+                            <h5>Скидка</h5>
+                        </td>
+                        <td>
+                            <h5>Кол-во использований</h5>
+                        </td>
+                        <td>
+                            <h5>Статус</h5>
+                        </td>
+                        <td>
+                            <h5>Создан</h5>
+                        </td>
+                        <td>
+                            <h5>Действует до</h5>
+                        </td>
+                        </thead>
+                         {% for promo in promos %}
+                             <tr>
+                             <td>
+                                 {{ promo.code }}
+                             </td>
+                             <td>
+                                 {{ promo.coupon.percent_off }} %
+                             </td>
+                             <td>
+                                 {{ promo.times_redeemed }}
+                             </td>
+                             <td>
+                                 {% if promo.active %}
+                                    Активен
+                                 {% else %}
+                                    Деактивирован
+                                {% endif %}
+                             </td>
+                             <td>
+                                 {{ promo.created|timestamp_to_time|date:"D d M Y"  }}
+                             </td>
+                                 <td>
+                                     {% if promo.expires_at %}
+                                     {{ promo.expires_at|timestamp_to_time|date:"D d M Y" }}
+                                     {% else %}
+                                         Действует бессрочно
+                                     {% endif %}
+                                 </td>
+                         {% endfor %}
+                     </table>
+</div>
+
+{% endblock content %}

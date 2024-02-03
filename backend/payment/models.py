@@ -1,13 +1,15 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
 
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Sum
 from shop.models import Product
+from recommend.models import Coupon
 
 User = get_user_model()
-
 
 class ShippingAddress(models.Model):
     full_name = models.CharField(max_length=100)
@@ -26,7 +28,7 @@ class ShippingAddress(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return "Адресс" + " - " + self.full_name
+        return "Адрес" + " - " + self.full_name
 
     @classmethod
     def create_default_shipping_address(cls, user):
@@ -55,10 +57,13 @@ class Order(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    completed = models.DateTimeField(null=True, blank=True)
     paid = models.BooleanField(default=False)
     discount = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon', null=True, blank=True)
     status = models.CharField(max_length=100, choices=CHOICES, default='Не оплачен')
+    cancel_reason = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name = "Заказ"
@@ -78,6 +83,13 @@ class Order(models.Model):
     def get_total_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
 
+    def set_discount(self):
+        if self.coupon:
+            self.discount = self.coupon.discount
+        else:
+            self.discount = OrderItem.objects.filter(order=self).aggregate(Sum('price'))
+        return self.discount
+
     @property
     def get_discount(self):
         if (total_cost := self.get_total_cost_before_discount()) and self.discount:
@@ -87,6 +99,10 @@ class Order(models.Model):
     def get_total_cost(self):
         total_cost = self.get_total_cost_before_discount()
         return total_cost - self.get_discount
+
+    def complete_order(self):
+        self.completed = datetime.now()
+        return self.completed
 
 
 class OrderItem(models.Model):

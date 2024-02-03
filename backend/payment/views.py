@@ -21,6 +21,8 @@ from django.conf import settings
 
 from shop.models import ProductProxy
 
+from recommend.models import CouponProxy
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION
 
@@ -81,13 +83,35 @@ def complete_order(request):
                 'index': index,
             })
 
+
         if payment_type == "stripe-payment":
+
+            # if coupon and not stripe.Coupon.retrieve(coupon.code):
+            #     if coupon.is_mass:
+            #         stripe.Coupon.create(
+            #             duration="forever",
+            #             id=coupon.code,
+            #             percent_off=coupon.discount,
+            #         )
+            #     else:
+            #         stripe.Coupon.create(
+            #             duration="once",
+            #             id=coupon.code,
+            #             percent_off=coupon.discount,
+            #         )
+            #     stripe.PromotionCode.create(
+            #         coupon=coupon.code,
+            #         code=coupon.code,
+            #         customer="cus_PTyLqgPcgQL4yi",
+            #     )
             session_data = {
                 'mode': 'payment',
                 'success_url': request.build_absolute_uri(reverse('payment:payment-success')),
                 'cancel_url': request.build_absolute_uri(reverse('payment:payment-failed')),
-                'line_items': []
+                'line_items': [],
+                'allow_promotion_codes': True,
             }
+
 
             if request.user.is_authenticated:
                 order = Order.objects.create(
@@ -106,6 +130,7 @@ def complete_order(request):
                                 'name': item['product']
                             },
                         },
+
                         'quantity': item['qty'],
                     })
                 session_data['client_reference_id'] = order.id

@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'drf_yasg',
-    'django_simple_coupons',
 
     #apps
     'shop',
@@ -117,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 LANGUAGE_CODE = 'ru'
 
@@ -240,5 +238,3 @@ DJOSER = {
     'AUTH_HEADER_TYPES': ('JWT',),
 
 }
-
-DSC_COUPON_CODE_LENGTH = 16

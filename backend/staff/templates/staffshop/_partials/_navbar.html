@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light p-3 shadow-sm ">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'shop:products' %}"><i class="fa-solid fa-shop me-2"></i>
+        <a class="navbar-brand" href="{% url 'staff:products' %}"><i class="fa-solid fa-shop me-2"></i>
             <strong>Kern Shop</strong></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
             aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,20 +17,15 @@
         </div>
     </form>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <form action="{% url 'shop:search-products' %}" method="get">
-            <div class="ms-auto d-none d-lg-block">
-                <div class="input-group">
-                    <span class="border-success input-group-text text-white search-button"><i
-                            class="fa-solid fa-magnifying-glass"></i></span>
-                    <input type="text" name="q" placeholder="Например Samsung..." class="form-control border-success" style="color: #7a7a7a" />
-                    <button class="btn btn-success text-dark search-button">Поиск</button>
-                </div>
-            </div>
-        </form>
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:cat_list' %}"
-                ><i class="fa-solid fa-circle-user me-1"></i>Категории</a
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:mailing' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Рассылка</a
+              >
+            </li>
+              <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:promo' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Промокоды</a
               >
             </li>
               <li class="nav-item">
@@ -41,6 +36,11 @@
               <li class="nav-item">
               <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:completed_orders' %}"
                 ><i class="fa-solid fa-circle-user me-1"></i>Завершенные заказы</a
+              >
+            </li>
+               <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="{% url 'staff:add_product' %}"
+                ><i class="fa-solid fa-circle-user me-1"></i>Добавить товар</a
               >
             </li>
               <li class="nav-item">

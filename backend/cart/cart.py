@@ -16,12 +16,12 @@ class Cart():
 
         self.cart = cart
 
-
     def __len__(self):
         return sum(item['qty'] for item in self.cart.values())
 
+
     def __iter__(self):
-        product_ids = self.cart.keys()
+        product_ids = [key for key in self.cart.keys()]
         products = ProductProxy.objects.filter(id__in=product_ids)
         cart = self.cart.copy()
 
@@ -29,7 +29,7 @@ class Cart():
             cart[str(product.id)]['product'] = product
             cart[str(product.id)]['product_pk'] = product.pk
 
-        for item in cart.values():
+        for key, item in cart.items():
             item['price'] = Decimal(item['price'])
             item['total'] = item['price'] * item['qty']
             yield item
@@ -45,7 +45,6 @@ class Cart():
 
         self.session.modified = True
 
-
     def delete(self, product):
         product_id = str(product)
         if product_id in self.cart:
@@ -58,5 +57,14 @@ class Cart():
             self.cart[product_id]['qty'] = quantity
             self.session.modified = True
 
+    # def add_promo(self, coupon, discount):
+    #     coupon = str(coupon.code)
+    #     if coupon not in self.cart:
+    #         self.cart['coupon'] = {'code': coupon, 'discount': discount, 'qty': 0, 'price': 0}
+    #         self.cart['coupon']['qty'] = 0
+    #     self.session.modified = True
+
     def get_total_price(self):
-        return sum(Decimal(item['price']) * item['qty'] for item in self.cart.values())
+        cart = self.cart.copy()
+        total_price = sum(Decimal(item['price']) * item['qty'] for item in self.cart.values())
+        return total_price

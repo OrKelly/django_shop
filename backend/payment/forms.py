@@ -15,5 +15,5 @@ class ShippingAddressForm(forms.ModelForm):
             'city': 'Город',
             'street_address': 'Улица',
             'apartment_address': 'Дом',
-            'index': 'Почтовый индекс'
+            'index': 'Почтовый индекс',
         }
