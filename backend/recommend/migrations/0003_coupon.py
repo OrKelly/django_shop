@@ -2,7 +2,6 @@
 
 import django.core.validators
 from django.db import migrations, models
-import recommend.utils
 
 
 class Migration(migrations.Migration):
@@ -16,7 +15,7 @@ class Migration(migrations.Migration):
             name='Coupon',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(default=recommend.utils.get_random_code, max_length=12, unique=True, verbose_name='Купон')),
+                ('code', models.CharField(default=0, max_length=12, unique=True, verbose_name='Купон')),
                 ('discount', models.IntegerField(validators=[django.core.validators.MinValueValidator(5), django.core.validators.MaxValueValidator(50)], verbose_name='Размер скидки')),
                 ('available', models.BooleanField(default=True, verbose_name='Активность')),
                 ('created', models.DateTimeField(auto_now=True, verbose_name='Дата создания')),

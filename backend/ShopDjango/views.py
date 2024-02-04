@@ -2,4 +2,4 @@ from django.shortcuts import render
 
 
 def index(request):
-    return render(request, 'shopdjango/index.html')
+    return render(request, 'shop/products.html')

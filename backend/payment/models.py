@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Sum
 from shop.models import Product
-from recommend.models import Coupon
 
 User = get_user_model()
 
@@ -32,6 +31,7 @@ class ShippingAddress(models.Model):
 
     @classmethod
     def create_default_shipping_address(cls, user):
+        """Создаем пустой адрес для новых пользователей"""
         default_shipping_address = {"user": user, "full_name": "Noname", "email": "email@example.com",
                                     "street_address": "fill address", "apartment_address": "fill address",
                                     "country": ""}
@@ -41,6 +41,7 @@ class ShippingAddress(models.Model):
 
 
 class Order(models.Model):
+    #   статусы заказа
     CHOICES = (
         ('Не оплачен', 'Не оплачен'),
         ('Оплачен', 'Оплачен'),
@@ -61,7 +62,6 @@ class Order(models.Model):
     paid = models.BooleanField(default=False)
     discount = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon', null=True, blank=True)
     status = models.CharField(max_length=100, choices=CHOICES, default='Не оплачен')
     cancel_reason = models.CharField(max_length=100, null=True, blank=True)
 
@@ -81,26 +81,22 @@ class Order(models.Model):
         return "Order" + str(self.id)
 
     def get_total_cost_before_discount(self):
+        """Возвращает общую стоимость заказа до скидки"""
         return sum(item.get_cost() for item in self.items.all())
-
-    def set_discount(self):
-        if self.coupon:
-            self.discount = self.coupon.discount
-        else:
-            self.discount = OrderItem.objects.filter(order=self).aggregate(Sum('price'))
-        return self.discount
-
     @property
     def get_discount(self):
+        """Возвращает сумму скидки заказа"""
         if (total_cost := self.get_total_cost_before_discount()) and self.discount:
             return total_cost * (self.discount / Decimal(100))
         return Decimal(0)
 
     def get_total_cost(self):
+        """Возвращает общую стоимость заказа"""
         total_cost = self.get_total_cost_before_discount()
         return total_cost - self.get_discount
 
     def complete_order(self):
+        """Устанавливает дату выполнения заказа"""
         self.completed = datetime.now()
         return self.completed
 
@@ -118,18 +114,18 @@ class OrderItem(models.Model):
     def __str__(self):
         return "Товар" + str(self.id)
 
-    def get_cost(self):
-        return self.price * self.quantity
-
     @property
     def total_cost(self):
+        """Возвращает общую стоимость позиции в заказе"""
         return self.price * self.quantity
 
     @classmethod
     def get_total_quantity_for_product(cls, product):
+        """Возвращает общее количество заказов этого продукта"""
         return cls.objects.filter(product=product).aggregate(total_quantity=models.Sum('quantity'))[
             'total_quantity'] or 0
 
     @staticmethod
     def get_average_price():
+        """Возвращает средную стоимость всех продуктов"""
         return OrderItem.objects.aggregate(average_price=models.Avg('price'))['average_price']

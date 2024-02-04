@@ -45,6 +45,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         return str(discounted_price)
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
+    """Создаем пользователя посредством API запроса"""
     class Meta:
         model = User
         fields = ['email', 'password']

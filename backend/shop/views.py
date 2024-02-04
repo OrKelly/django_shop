@@ -29,9 +29,11 @@ def product_detail_view(request, slug):
     product = get_object_or_404(
         ProductProxy.objects.select_related('category'), slug=slug)
     try:
+        # получаем информацию о отзывах покупателя на этот продукт и о том, заказывал ли он продукт
         buyer = OrderItem.objects.filter(Q(product=product) & Q(user=request.user))
         check_reviews = product.reviews.filter(created_by=request.user).exists()
     except TypeError:
+        # если не находим данные
         buyer, check_reviews = False, False
     finally:
         if request.method == 'POST':
@@ -46,6 +48,7 @@ def product_detail_view(request, slug):
                     rating = request.POST.get('rating', 3)
                     content = request.POST.get('content', '')
                     if content:
+                        # создаем отзыв
                         product.reviews.create(
                             rating=rating, content=content, created_by=request.user, product=product)
                         product.get_rating()

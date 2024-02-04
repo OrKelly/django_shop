@@ -26,6 +26,12 @@ class PromoCreatingForm(forms.Form):
     sale = forms.ChoiceField(label='Процент скидки', choices=CHOICES)
     expires_on = forms.DateField(label='Действует до', widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
         input_formats=["%Y-%m-%d"])
+    send_email = forms.BooleanField(label='Разослать его клиентам?', required=False, initial=False)
+    title = forms.CharField(label='Заголовок', max_length=100, required=False, widget=forms.TextInput({'placeholder':'Заголовок', 'display': 'none'}))
+    mail = forms.CharField(label='''Письмо.
+    {sale} - сумма скидки или её процент, {promo} - промокод.
+    Заполнять их не нужно, значения подставятся сами. НЕ МЕНЯТЬ НАЗВАНИЯ ВНУТРИ {}''',
+                           widget=forms.Textarea({'placeholder':'Письмо', 'display': 'none'}), required=False)
 
 
 

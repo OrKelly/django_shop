@@ -46,4 +46,31 @@
 
 <br>
 
+    <script>
+
+        $('#id_send_email').click(function() {
+            if ($(this).is(':checked')){
+                $("#div_id_title").show();
+                $('#div_id_mail').show();
+            } else {
+                $("#div_id_title").hide();
+                $('#div_id_mail').hide();
+            }
+        $.ajax({
+            type: 'GET',
+            url: '{% url "staff:set_email_template" %}',
+            dataType: 'json',
+            success: function(response){
+                $("#id_title").val(response.title)
+                $("#id_mail").val(response.mail)
+
+            },
+            error: function(error, status){
+                console.log(error)
+            }
+        })
+        })
+
+
+    </script>
 {% endblock content %}

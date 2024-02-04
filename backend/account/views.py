@@ -7,13 +7,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django_email_verification import send_email
 
-
 from .forms import UserCreateForm, LoginForm, UserUpdateForm
 from payment.models import Order, ShippingAddress
 from payment.forms import ShippingAddressForm
 
-
 User = get_user_model()
+
 
 def register_user(request):
     if request.method == 'POST':
@@ -25,22 +24,22 @@ def register_user(request):
             user_username = form.cleaned_data.get('username')
             user_password = form.cleaned_data.get('password1')
 
-            # Create new user
+            # добавляем нового пользователя в базу данных
             user = User.objects.create_user(
                 username=user_username, email=user_email, password=user_password
             )
 
             user.is_active = False
 
-            send_email(user)
+            send_email(user)  # отправляем письмо на email для подтверждения регистрации
 
             return redirect('/account/email-verification-sent/')
     else:
         form = UserCreateForm()
     return render(request, 'account/registration/register.html', {'form': form})
 
-def login_user(request):
 
+def login_user(request):
     form = LoginForm()
 
     if request.user.is_authenticated:
@@ -61,21 +60,24 @@ def login_user(request):
             messages.info(request, 'Неверный логин или пароль!')
             return redirect('account:login')
 
-    return render(request, 'account/login/login.html', {'form':form})
+    return render(request, 'account/login/login.html', {'form': form})
 
 
 def logout_user(request):
     session_keys = list(request.session.keys())
-    for key in session_keys:
+    for key in session_keys:    # очищаем сессию
         if key == 'session_key':
             continue
         del request.session[key]
     logout(request)
     return redirect('shop:products')
 
+
 @login_required(login_url='account:login')
 def dashboard_user(request):
-    orders = Order.objects.select_related('user').filter(user=request.user).aggregate(summ=Round(Sum(F('amount'))), total=Count('id'))
+    # получаем информацию обо всех заказах и их сумму и количество
+    orders = Order.objects.select_related('user').filter(user=request.user).aggregate(summ=Round(Sum(F('amount'))),
+                                                                                      total=Count('id'))
     user_orders = Order.objects.select_related('user').filter(user=request.user).order_by('created')
     try:
         shipping_address = ShippingAddress.objects.get(user=request.user)
@@ -91,7 +93,8 @@ def dashboard_user(request):
             shipping_address.save()
             return redirect('account:dashboard')
 
-    return render(request, 'account/dashboard/dashboard.html', {'orders':orders, 'form':form, 'user_orders':user_orders})
+    return render(request, 'account/dashboard/dashboard.html',
+                  {'orders': orders, 'form': form, 'user_orders': user_orders})
 
 
 @login_required(login_url='account:login')
@@ -105,9 +108,10 @@ def profile_user(request):
     else:
         form = UserUpdateForm(request.GET)
     context = {
-        'form':form
+        'form': form
     }
     return render(request, 'account/dashboard/profile-management.html', context)
+
 
 @login_required(login_url='account:login')
 def delete_user(request):

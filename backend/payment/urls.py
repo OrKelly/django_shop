@@ -13,5 +13,4 @@ urlpatterns = [
     path('order_detail/<int:order_id>', views.order_detail_view, name='order_detail_view'),
     path('webhook-stripe/', stripe_webhook, name='webhook-stripe'),
     path('webhook-yookassa/', yookassa_webhook, name='webhook-yookassa'),
-    # path("order/<int:order_id>/pdf/", views.admin_order_pdf, name="admin_order_pdf"),
 ]

@@ -6,25 +6,25 @@ from django.core.mail import send_mail
 import stripe
 
 from payment.models import Order
-from recommend.utils import get_random_code, get_coupon_code_length
 
 
 User = get_user_model()
 @shared_task()
-def send_cancel_order_mail(order_id, form):
+def send_cancel_order_mail(order_id, title, coupon):
+    # отправляем клиенту письмо при отмене заказа
     order = Order.objects.get(id=order_id)
     subject = f'Заказ {order.id} отменен'
     receipent_email = order.user.email
 
-    if form.cleaned_data['send_coupon']:
+    if coupon:  # если при отправке выбрано "отправить промокод"
         coupon = stripe.PromotionCode.create(
             coupon='BLVPs4rB',
             max_redemptions=1,
         )
-        message = f'К сожалению, нам пришлось отменить ваш заказ. Причина:{form.cleaned_data["title"]}' \
+        message = f'К сожалению, нам пришлось отменить ваш заказ. Причина:{title}' \
                   f'В качестве извинения присылаем вам купон на скидку для следующего заказа. Вот он: {coupon.code}'
     else:
-        message = f'К сожалению, нам пришлось отменить ваш заказ. Причина:{form.cleaned_data["title"]}. Извините, что ' \
+        message = f'К сожалению, нам пришлось отменить ваш заказ. Причина:{title}. Извините, что ' \
                   f'так получилось'
 
     mail_to_sender = send_mail(
@@ -37,6 +37,7 @@ def send_cancel_order_mail(order_id, form):
 
 @shared_task()
 def mail_sending(title, mail):
+    # email рассылка всем пользователям
     users = User.objects.all()
     subject = title
     message = mail

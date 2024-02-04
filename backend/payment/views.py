@@ -21,7 +21,6 @@ from django.conf import settings
 
 from shop.models import ProductProxy
 
-from recommend.models import CouponProxy
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION

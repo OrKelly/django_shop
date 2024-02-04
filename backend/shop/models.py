@@ -10,6 +10,7 @@ from django.urls import reverse
 
 
 def rand_slug():
+    """Возвращает случайный слаг из букв и цифр"""
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(3))
 
 
@@ -27,7 +28,7 @@ class Category(models.Model):
 
     def __str__(self):
         """
-        Returns a string representation of the object.
+        Возвращает строковое представление категории и её родителей (при наличии)
         """
         full_path = [self.name]
         k = self.parent
@@ -46,7 +47,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name='Категория')
     title = models.CharField('Название', max_length=250)
     brand = models.CharField('Бренд', max_length=250)
     description = models.TextField('Описание', blank=True)
@@ -56,7 +57,7 @@ class Product(models.Model):
     slug = models.SlugField('URL', max_length=250)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
-    discount = models.IntegerField(
+    discount = models.IntegerField('Акция',
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     rating = models.DecimalField('Рейтинг', null=True, blank=True, max_digits=3, decimal_places=2)
 
@@ -69,6 +70,7 @@ class Product(models.Model):
         return self.title
 
     def get_rating(self):
+        """Считает средний рейтинг на основе всех отзывов"""
         count = self.reviews.count()
         if count > 0:
             sum = int(list(self.reviews.aggregate(Sum('rating')).values())[0])
@@ -89,10 +91,7 @@ class Product(models.Model):
 
     def get_discounted_price(self):
         """
-        Calculates the discounted price based on the product's price and discount.
-
-        Returns:
-            decimal.Decimal: The discounted price.
+        Расчитывает и возвращает стоимость товара с учетом скидки
         """
         discounted_price = self.price - (self.price * self.discount / 100)
         return round(discounted_price, 2)
@@ -100,13 +99,13 @@ class Product(models.Model):
     @property
     def full_image_url(self):
         """
-        Returns:
-            str: The full image URL.
+        Возвращает ссылку на изображение
         """
         return self.image.url if self.image else ''
 
 
 class ProductManager(models.Manager):
+    """Возвращает список всех доступных товаров"""
     def get_queryset(self):
         return super(ProductManager, self).get_queryset().filter(available__gt=0)
 

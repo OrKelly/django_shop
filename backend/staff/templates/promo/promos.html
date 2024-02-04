@@ -30,6 +30,9 @@
                         <td>
                             <h5>Действует до</h5>
                         </td>
+                        <td>
+
+                        </td>
                         </thead>
                          {% for promo in promos %}
                              <tr>
@@ -59,6 +62,11 @@
                                          Действует бессрочно
                                      {% endif %}
                                  </td>
+                             <td>
+                                {% if promo.active %}
+                                    <a type="button" class="btn btn-danger" href="{% url 'staff:deactivate_promo' promo.id %}">Деактивировать</a>
+                                {% endif %}
+                             </td>
                          {% endfor %}
                      </table>
 </div>
