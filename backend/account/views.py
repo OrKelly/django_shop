@@ -24,14 +24,14 @@ def register_user(request):
             user_username = form.cleaned_data.get('username')
             user_password = form.cleaned_data.get('password1')
 
-            # добавляем нового пользователя в базу данных
+            # creating new user
             user = User.objects.create_user(
                 username=user_username, email=user_email, password=user_password
             )
 
             user.is_active = False
 
-            send_email(user)  # отправляем письмо на email для подтверждения регистрации
+            send_email(user)  # sending email for register confirmation
 
             return redirect('/account/email-verification-sent/')
     else:
@@ -65,7 +65,7 @@ def login_user(request):
 
 def logout_user(request):
     session_keys = list(request.session.keys())
-    for key in session_keys:    # очищаем сессию
+    for key in session_keys:    # clear session
         if key == 'session_key':
             continue
         del request.session[key]
@@ -75,7 +75,7 @@ def logout_user(request):
 
 @login_required(login_url='account:login')
 def dashboard_user(request):
-    # получаем информацию обо всех заказах и их сумму и количество
+    # get information about all user's orders, total cost and count of them
     orders = Order.objects.select_related('user').filter(user=request.user).aggregate(summ=Round(Sum(F('amount'))),
                                                                                       total=Count('id'))
     user_orders = Order.objects.select_related('user').filter(user=request.user).order_by('created')

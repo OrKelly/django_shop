@@ -7,23 +7,23 @@ from . import views
 app_name = 'account'
 
 urlpatterns = [
-    # регистрация пользователя
+    # registation
     path('register/', views.register_user, name='register'),
     path('email-verification-sent/',
          lambda request: render(
              request, 'account/email/email-verification-sent.html'),
          name='email-verification-sent'),
 
-    # авторизация и выход из аккаунта
+    # login and logout
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
 
-    # профиль
+    # dashboard
     path('dashboard/', views.dashboard_user, name='dashboard'),
     path('profile-management/', views.profile_user, name='profile-management'),
     path('delete-user/', views.delete_user, name='delete-user'),
 
-    # восстановление пароля
+    # password reset
     path('password-reset/', auth_views.PasswordResetView.as_view(
         template_name='account/password/password_reset.html',
         email_template_name='account/password/password_reset_email.html',

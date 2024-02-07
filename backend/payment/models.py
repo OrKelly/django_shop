@@ -10,6 +10,7 @@ from shop.models import Product
 
 User = get_user_model()
 
+
 class ShippingAddress(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=254)
@@ -31,7 +32,7 @@ class ShippingAddress(models.Model):
 
     @classmethod
     def create_default_shipping_address(cls, user):
-        """Создаем пустой адрес для новых пользователей"""
+        """Creating blank shipping address for new users"""
         default_shipping_address = {"user": user, "full_name": "Noname", "email": "email@example.com",
                                     "street_address": "fill address", "apartment_address": "fill address",
                                     "country": ""}
@@ -41,7 +42,7 @@ class ShippingAddress(models.Model):
 
 
 class Order(models.Model):
-    #   статусы заказа
+    #   order's statuses
     CHOICES = (
         ('Не оплачен', 'Не оплачен'),
         ('Оплачен', 'Оплачен'),
@@ -81,22 +82,23 @@ class Order(models.Model):
         return "Order" + str(self.id)
 
     def get_total_cost_before_discount(self):
-        """Возвращает общую стоимость заказа до скидки"""
+        """Returns total cost before discount"""
         return sum(item.get_cost() for item in self.items.all())
+
     @property
     def get_discount(self):
-        """Возвращает сумму скидки заказа"""
+        """Returns discount's summ"""
         if (total_cost := self.get_total_cost_before_discount()) and self.discount:
             return total_cost * (self.discount / Decimal(100))
         return Decimal(0)
 
     def get_total_cost(self):
-        """Возвращает общую стоимость заказа"""
+        """Returns total cost of orders"""
         total_cost = self.get_total_cost_before_discount()
         return total_cost - self.get_discount
 
     def complete_order(self):
-        """Устанавливает дату выполнения заказа"""
+        """Sets date of complete order"""
         self.completed = datetime.now()
         return self.completed
 
@@ -116,16 +118,14 @@ class OrderItem(models.Model):
 
     @property
     def total_cost(self):
-        """Возвращает общую стоимость позиции в заказе"""
         return self.price * self.quantity
 
     @classmethod
     def get_total_quantity_for_product(cls, product):
-        """Возвращает общее количество заказов этого продукта"""
+        """Returns total quantity of orders with this product"""
         return cls.objects.filter(product=product).aggregate(total_quantity=models.Sum('quantity'))[
             'total_quantity'] or 0
 
     @staticmethod
     def get_average_price():
-        """Возвращает средную стоимость всех продуктов"""
         return OrderItem.objects.aggregate(average_price=models.Avg('price'))['average_price']

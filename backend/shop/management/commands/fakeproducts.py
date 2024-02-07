@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         fake = Faker()
-        # Create 100 fake products
+        # Create 30 fake products
         for _ in range(30):
             product_title = fake.company()
             product_brand = fake.company()

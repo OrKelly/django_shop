@@ -21,7 +21,7 @@ from .forms import ProductChangeForm, MailSendingForm, CancelOrderForm, PromoCre
 
 
 def group_required(*group_names):
-    """Проверяет группы пользователя, и если они входят в требуемые - пропускает его"""
+    """Requires user membership in at least one of the groups passed in."""
 
     def in_groups(u):
         if u.is_authenticated:
@@ -173,16 +173,15 @@ def list_promo(request):
 @group_required('staff')
 def add_promo(request):
     form = PromoCreatingForm()
-    User = get_user_model()
     if request.method == 'POST':
         form = PromoCreatingForm(request.POST)
         if form.is_valid():
-            date = format(form.cleaned_data['expires_on'], 'U')  # конвертируем дату в unix формат
+            date = format(form.cleaned_data['expires_on'], 'U')  # convers datetime to unix format
             coupon = stripe.PromotionCode.create(
                 coupon=f'sale{form.cleaned_data["sale"]}',
                 expires_at=format(form.cleaned_data['expires_on'], 'U')
             )
-            if form.cleaned_data['send_email']: # если выбрано "отправить клиентам письмо"
+            if form.cleaned_data['send_email']:
                 if form.cleaned_data['title'] and form.cleaned_data['mail']:
                     title = form.cleaned_data['title']
                     mail = form.cleaned_data['mail'].format(sale=coupon.coupon.percent_off, promo=coupon.code)
@@ -195,7 +194,7 @@ def add_promo(request):
 
 @group_required('staff')
 def set_promo_mail_template(request):
-    # шаблон для отправки письма с промокодом клиентам
+    # template to send promo mail
     if request.method == 'GET':
         title = 'НОВАЯ АКЦИЯ! УСПЕЙ, ПОКА ВСЕ НЕ РАЗОБРАЛИ!'
         mail = 'У нас есть персональный подарок для тебя! Активируй наш новый промокод и получи скидку - {sale}. ' \

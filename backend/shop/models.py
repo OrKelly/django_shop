@@ -8,18 +8,17 @@ from django.utils.text import slugify
 from django.urls import reverse
 
 
-
 def rand_slug():
-    """Возвращает случайный слаг из букв и цифр"""
+    """Returns random slug"""
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(3))
 
 
 class Category(models.Model):
-    name = models.CharField('Категория',max_length=250, db_index=True)
-    parent = models.ForeignKey('self',verbose_name='Родительская категория', on_delete=models.CASCADE,
+    name = models.CharField('Категория', max_length=250, db_index=True)
+    parent = models.ForeignKey('self', verbose_name='Родительская категория', on_delete=models.CASCADE,
                                related_name='children', blank=True, null=True)
     slug = models.SlugField('URL', max_length=250, unique=True, null=False, editable=True)
-    created_at = models.DateTimeField('Дата создания',auto_now_add=True)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
         unique_together = (['slug', 'parent'])
@@ -28,7 +27,7 @@ class Category(models.Model):
 
     def __str__(self):
         """
-        Возвращает строковое представление категории и её родителей (при наличии)
+        Returns str representation of category and their parents(if exists)
         """
         full_path = [self.name]
         k = self.parent
@@ -52,13 +51,14 @@ class Product(models.Model):
     brand = models.CharField('Бренд', max_length=250)
     description = models.TextField('Описание', blank=True)
     price = models.DecimalField('Цена', max_digits=7, decimal_places=2, default=999.99)
-    image = models.ImageField('Изображение', upload_to='images/products/%Y/%m/%d', default='images/products/default.jpg')
+    image = models.ImageField('Изображение', upload_to='images/products/%Y/%m/%d',
+                              default='images/products/default.jpg')
     available = models.IntegerField('Наличие', default=10, blank=False, null=True)
     slug = models.SlugField('URL', max_length=250)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
     discount = models.IntegerField('Акция',
-        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+                                   default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     rating = models.DecimalField('Рейтинг', null=True, blank=True, max_digits=3, decimal_places=2)
 
     class Meta:
@@ -70,11 +70,11 @@ class Product(models.Model):
         return self.title
 
     def get_rating(self):
-        """Считает средний рейтинг на основе всех отзывов"""
+        """Counting average rating"""
         count = self.reviews.count()
         if count > 0:
             sum = int(list(self.reviews.aggregate(Sum('rating')).values())[0])
-            self.rating = round(float(sum/count),2)
+            self.rating = round(float(sum / count), 2)
             return self.rating
 
     def save(self, *args, **kwargs):
@@ -91,7 +91,7 @@ class Product(models.Model):
 
     def get_discounted_price(self):
         """
-        Расчитывает и возвращает стоимость товара с учетом скидки
+        Returns product price with discount
         """
         discounted_price = self.price - (self.price * self.discount / 100)
         return round(discounted_price, 2)
@@ -99,18 +99,20 @@ class Product(models.Model):
     @property
     def full_image_url(self):
         """
-        Возвращает ссылку на изображение
+        Returns image url
         """
         return self.image.url if self.image else ''
 
 
 class ProductManager(models.Manager):
-    """Возвращает список всех доступных товаров"""
+    """Returns all available products"""
+
     def get_queryset(self):
         return super(ProductManager, self).get_queryset().filter(available__gt=0)
 
-class ProductProxy(Product):
 
+class ProductProxy(Product):
     objects = ProductManager()
+
     class Meta:
         proxy = True

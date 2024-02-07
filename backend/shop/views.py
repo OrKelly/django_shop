@@ -16,24 +16,25 @@ class ProductListView(ListView):
             return "shop/components/product_list.html"
         return "shop/products.html"
 
+
 class SalesListView(ListView):
     context_object_name = 'products'
     template_name = 'shop/search_products.html'
+
     def get_queryset(self):
         sales = ProductProxy.objects.filter(discount__gt=0).order_by('-discount')
         return sales
-
 
 
 def product_detail_view(request, slug):
     product = get_object_or_404(
         ProductProxy.objects.select_related('category'), slug=slug)
     try:
-        # получаем информацию о отзывах покупателя на этот продукт и о том, заказывал ли он продукт
+        # getting information about user's review on this product and did he order this product
         buyer = OrderItem.objects.filter(Q(product=product) & Q(user=request.user))
         check_reviews = product.reviews.filter(created_by=request.user).exists()
     except TypeError:
-        # если не находим данные
+        # if not - setting false
         buyer, check_reviews = False, False
     finally:
         if request.method == 'POST':
@@ -48,7 +49,7 @@ def product_detail_view(request, slug):
                     rating = request.POST.get('rating', 3)
                     content = request.POST.get('content', '')
                     if content:
-                        # создаем отзыв
+                        # creating review
                         product.reviews.create(
                             rating=rating, content=content, created_by=request.user, product=product)
                         product.get_rating()
@@ -58,7 +59,7 @@ def product_detail_view(request, slug):
                 messages.error(
                     request, 'Вы должны быть авторизованы, чтобы оставить отзыв')
 
-        context = {'product': product, 'buyer':buyer, 'check_reviews':check_reviews}
+        context = {'product': product, 'buyer': buyer, 'check_reviews': check_reviews}
     return render(request, 'shop/product_detail.html', context)
 
 

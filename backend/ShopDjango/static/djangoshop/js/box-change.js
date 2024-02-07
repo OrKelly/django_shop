@@ -11,6 +11,6 @@ boxes.forEach((box) => {
   box.addEventListener("mouseout", () => {
     document.body.style.backgroundColor = "#000000";
     const welcome = document.getElementById("welcome");
-    welcome.innerText = "Welcome to BigCorp";
+    welcome.innerText = "Welcome to KernShop";
   });
 });

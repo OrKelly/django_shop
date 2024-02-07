@@ -3,19 +3,18 @@ from decimal import Decimal
 from shop.models import ProductProxy
 
 
-class Cart():
-    """Корзина, хранящая в себе товары для дальнейшего заказа. Все данные хранит в сессии.
+class Cart:
+    """Cart, that stores products for order. Based on sessions.
 
-        Методы:
+        Methods:
 
-        __len__ = получает количество всех предметов в ней;
-        __iter__ = получает все продукты из базы данных по их id, хранящихся в сессии;
-        add = добавляет продукт в корзину;
-        delete = удаляет продукт из корзины;
-        update = обновляет количество товара в корзине на то, которое указано пользователем
-        get_total_price = получает итоговую стоимость всей корзины
+        __len__ = calcutes quantity of products in cart;
+        __iter__ = get products and presents they by their id's in a session;
+        add = adds product in a cart;
+        delete = deletes product from cart;
+        update = updates product's quantity to the one specified by the user;
+        get_total_price = gets total price of all products in cart
         """
-
 
     def __init__(self, request) -> None:
 
@@ -30,7 +29,6 @@ class Cart():
 
     def __len__(self):
         return sum(item['qty'] for item in self.cart.values())
-
 
     def __iter__(self):
         product_ids = [key for key in self.cart.keys()]
@@ -68,13 +66,6 @@ class Cart():
         if product_id in self.cart:
             self.cart[product_id]['qty'] = quantity
             self.session.modified = True
-
-    # def add_promo(self, coupon, discount):
-    #     coupon = str(coupon.code)
-    #     if coupon not in self.cart:
-    #         self.cart['coupon'] = {'code': coupon, 'discount': discount, 'qty': 0, 'price': 0}
-    #         self.cart['coupon']['qty'] = 0
-    #     self.session.modified = True
 
     def get_total_price(self):
         cart = self.cart.copy()

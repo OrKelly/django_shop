@@ -7,7 +7,7 @@ from .models import Order, ShippingAddress
 
 @shared_task()
 def send_order_confirmation(order_id):
-    """Отправляем клиенту письмо о подтверждении и оформлении заказа"""
+    """Sends email to user with order confirmation"""
 
     order = Order.objects.get(id=order_id)
     subject = f'Подтверждение заказа №{order.id}'
@@ -16,6 +16,6 @@ def send_order_confirmation(order_id):
     message = f'Ваш заказ был подтвержден.Номер заказа - {order.id}. Скоро мы начнем его сборку'
 
     mail_to_sender = send_mail(
-        subject,message=message,from_email=settings.EMAIL_HOST_USER, recipient_list=[receipent_email],
+        subject, message=message, from_email=settings.EMAIL_HOST_USER, recipient_list=[receipent_email],
     )
     return mail_to_sender

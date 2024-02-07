@@ -19,15 +19,15 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # товары
-    path('products/', views.ProductListApiView.as_view()),
+    # products
+    path('products/', views.ProductListApiView.as_view(), name='products '),
     path("products/<int:pk>/", views.ProductDetailAPIView.as_view()),
-    # отзывы
+    # reviews
     path('reviews/create/', views.ReviewCreateView.as_view()),
-    # пользователи
+    # users
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
-    # документация
+    # docs
     path('swagger/', schema_view.with_ui('swagger',
                                          cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc',

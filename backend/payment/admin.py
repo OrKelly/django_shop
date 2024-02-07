@@ -38,7 +38,6 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     list_per_page = 15
     list_display_links = ['id', 'user']
-    # actions = [export_paid_to_csv, export_not_paid_to_csv]
 
 
 admin.site.register(Order, OrderAdmin)

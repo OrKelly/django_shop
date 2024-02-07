@@ -6,26 +6,28 @@ from shop.models import Category, Product
 
 User = get_user_model()
 
-class ProductSerializer(serializers.ModelSerializer):
 
+class ProductSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     category = serializers.SlugRelatedField(
         many=False,
         slug_field="name",
         queryset=Category.objects.all(),
     )
+
     class Meta:
         model = Product
         fields = ["id", "title", "brand", "image", "category", "price", "created_at", "updated_at"]
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id','rating', 'content', 'created_by', 'created_at','product_id']
+        fields = ['id', 'rating', 'content', 'created_by', 'created_at', 'product_id']
         read_only_fields = ['id', 'created_by', 'created_at']
 
-class ProductDetailSerializer(serializers.ModelSerializer):
 
+class ProductDetailSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     category = serializers.SlugRelatedField(
         many=False,
@@ -44,8 +46,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         discounted_price = obj.get_discounted_price()
         return str(discounted_price)
 
+
 class CustomUserCreateSerializer(serializers.ModelSerializer):
-    """Создаем пользователя посредством API запроса"""
+    """Creating user by API request"""
+
     class Meta:
         model = User
         fields = ['email', 'password']
